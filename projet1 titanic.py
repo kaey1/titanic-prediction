@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.model_selection import *
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
-import tkinter as tk
+import pygame
 df=pd.read_csv('titanic.csv')
 df = df.drop("Name", axis='columns')
 df = df.drop("Cabin", axis='columns')
@@ -20,38 +20,35 @@ model = DecisionTreeClassifier()
 model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 accuracy=accuracy_score(y_test, y_pred, normalize=True) 
-def button_clicked():
-    print("Button clicked!")
+
+    
+
+def gui(tx,ty):
+    screen_width = 1280
+    screen_height = 640
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    modele = DecisionTreeClassifier()
+    modele.fit(tx, ty)
+    pygame.init()
+    
+    pygame.display.set_caption("Le Titanic")
+    white = (255, 255, 255)
+    running = True
+    while running:
+
+        iy=screen_height-screen_height/10
+        ix=screen_width/2
+        image = pygame.image.load('titanic_sink.png')
+        screen.blit(image, (ix, iy))
+        pygame.display.flip()
+        screen.fill(white)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                
+    pygame.quit()
 if accuracy>0.65:
     print("yipeeee")
-    root = tk.Tk()
-    root.geometry("400x400")
-# Creating a button with specified options
-    button = tk.Button(root, 
-                   text="Click Me", 
-                   command=button_clicked,
-                   activebackground="blue", 
-                   activeforeground="white",
-                   anchor="center",
-                   bd=3,
-                   bg="lightgray",
-                   cursor="hand2",
-                   disabledforeground="gray",
-                   fg="black",
-                   font=("Arial", 12),
-                   height=2,
-                   highlightbackground="black",
-                   highlightcolor="green",
-                   highlightthickness=2,
-                   justify="center",
-                   overrelief="raised",
-                   padx=10,
-                   pady=5,
-                   width=15,
-                   wraplength=100)
-
-    button.pack(padx=20, pady=20)
-
-    root.mainloop()
+    gui(X,y)
 else:
     print("Le programme n'est pas sûr de ses prédictions. Veuillez contacter un NSIen immédiatement.")
