@@ -2,7 +2,11 @@ import pandas as pd
 from sklearn.model_selection import *
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
+
+import pygame_widgets
 import pygame
+from pygame_widgets.slider import Slider
+from pygame_widgets.textbox import TextBox
 
 import math
 df=pd.read_csv('titanic.csv')
@@ -57,7 +61,9 @@ def gui(tx,ty):
     running = True
     hc=0
     fc=0
-    
+    slider = Slider(screen, 60, 250, 300, 30, min=0, max=99, step=1)
+    output = TextBox(screen, 180, 300, 50, 50, fontSize=30)
+
     while running:
         pygame.init()
         iy=1
@@ -70,10 +76,13 @@ def gui(tx,ty):
         screen.blit(image, (ix, iy))
         pygame.display.flip()
         screen.fill(white)
+
+#############################################################################
         hommexy=(100,130)
         femmexy=(300,130)
         hommet="homme"
         femmet="femme"
+        text('Arial',(150,80),30,"votre sexe")
         text('Arial',hommexy,30,hommet)
         text('Arial',femmexy,30,femmet)
         hommexy=(50,150)
@@ -84,6 +93,20 @@ def gui(tx,ty):
             cercle(hommexy,10,0)
         elif fc==1:
             cercle(femmexy,10,0)
+
+################################################################################################
+        age=slider.getValue()
+        agexy=(150,200)
+        text('Arial',agexy,30,"Votre age")
+
+##################################################################################################
+        classe1xy=(100,300)
+        classe2xy=(150,300)
+        classe3xy=(250,300)
+        
+
+###################################################################################################
+#sibsp et parch
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -91,10 +114,20 @@ def gui(tx,ty):
                 mouse_x, mouse_y = event.pos
                 hc,fc=clickcercle(mouse_x, mouse_y,hommexy,hc,fc)
                 fc,hc=clickcercle(mouse_x, mouse_y,femmexy,fc,hc)
-                
+                if hc==1:
+                    hfc=0
+                elif fc==1:
+                    hfc=1
+                else:
+                    hfc=2
+
+        events = pygame.event.get()
+        output.setText(slider.getValue())
+        
+        pygame_widgets.update(events)        
     pygame.quit()
 if accuracy>0.65:
-    print("yipeeee")
+    print("Titanic")
     gui(X,y)
 else:
     print("Le programme n'est pas sûr de ses prédictions. Veuillez contacter un NSIen immédiatement.")
