@@ -8,7 +8,10 @@ import pygame
 from pygame_widgets.slider import Slider
 from pygame_widgets.textbox import TextBox
 
+import emoji
+
 import math
+print(emoji.EMOJI_DATA)
 df=pd.read_csv('titanic.csv')
 df = df.drop("Name", axis='columns')
 df = df.drop("Cabin", axis='columns')
@@ -35,13 +38,12 @@ def cercle(pos,radian,w):
     pygame.draw.circle(screen, noir, pos, radian,width=w)
 def text(font,xy,size,text):
      my_font = pygame.font.SysFont(font, size)
-     text_surface = my_font.render(text, False, (0, 0, 0))
+     text_surface = my_font.render(text, True, (0, 0, 0))
      screen.blit(text_surface, xy)
 def clickcercle(mouse_x,mouse_y,cerclexy):
-    distance = math.sqrt((mouse_x - cerclexy[0])**2 + (mouse_y - cerclexy[1])**2)
+    distance = math.sqrt((mouse_x - cerclexy[0])**2 + (mouse_y - cerclexy[1])**2)#equation math pour distance
     if distance <= 20:
         return True
-
 def gui(tx,ty):
     
     pygame.init()
@@ -60,9 +62,11 @@ def gui(tx,ty):
     c3=0
     c123=0
     sib1=0
-    slider = Slider(screen, 60, 250, 300, 30, min=0, max=99, step=1)
-    output = TextBox(screen, 180, 300, 50, 50, fontSize=30)
-
+    hfc=2
+    sliderage = Slider(screen, 60, 250, 300, 30, min=0, max=99, step=0.5)
+    outputage = TextBox(screen, 180, 300, 70, 50, fontSize=30)
+    slidersib = Slider(screen, 60, 500, 300, 30, min=0, max=10, step=1)
+    outputsib = TextBox(screen, 180, 550, 50, 50, fontSize=30)
     while running:
         pygame.init()
         iy=1
@@ -79,9 +83,9 @@ def gui(tx,ty):
 #############################################################################
         hommexy=(100,130)
         femmexy=(300,130)
-        hommet="homme"
-        femmet="femme"
-        text('Arial',(150,80),30,"votre sexe")
+        hommet="Homme"
+        femmet="Femme"
+        text('Arial',(150,80),30,"Votre sexe")
         text('Arial',hommexy,30,hommet)
         text('Arial',femmexy,30,femmet)
         hommexy=(50,150)
@@ -94,7 +98,7 @@ def gui(tx,ty):
             cercle(femmexy,10,0)
 
 ################################################################################################
-        age=slider.getValue()
+        age=sliderage.getValue()
         agexy=(150,200)
         text('Arial',agexy,30,"Votre age")
 
@@ -109,7 +113,7 @@ def gui(tx,ty):
         text('Arial',classe2xy,30,"2")
         text('Arial',classe3xy,30,"3")
         text('Arial',(cx,cy-40),30,"Votre classe sociale")
-        cx=100
+        cx+=50
         classe1xy=(cx,cy+20)
         classe2xy=(cx+cd,cy+20)
         classe3xy=(cx+cd+cd,cy+20)
@@ -123,16 +127,7 @@ def gui(tx,ty):
         elif c3==1:
             cercle(classe3xy,10,0)
 
-
 ###################################################################################################
-
-
-
-
-
-
-
-####################################################################################################
 # parch
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -188,14 +183,18 @@ def gui(tx,ty):
                         c3=1
                 ########################################################################################
         
-            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                
         events = pygame.event.get()
-        output.setText(slider.getValue())
-        
+        outputage.setText(sliderage.getValue())
+        outputsib.setText(slidersib.getValue())
+        text("Arial",(10,450),30,"Nombre de Frere soeur et epoux")
         pygame_widgets.update(events)        
     pygame.quit()
 if accuracy>0.65:
     print("Titanic")
     gui(X,y)
 else:
-    print("Le programme n'est pas sûr de ses prédictions. Veuillez contacter un NSIen immédiatement.")
+    print("Le programme n'est pas sûr de ses prédictions. Veuillez contacter un NSIen *IMMEDIATEMENT*!.")
