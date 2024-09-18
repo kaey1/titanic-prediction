@@ -37,16 +37,10 @@ def text(font,xy,size,text):
      my_font = pygame.font.SysFont(font, size)
      text_surface = my_font.render(text, False, (0, 0, 0))
      screen.blit(text_surface, xy)
-def clickcercle(mouse_x,mouse_y,cerclexy,clicked,anti):
+def clickcercle(mouse_x,mouse_y,cerclexy):
     distance = math.sqrt((mouse_x - cerclexy[0])**2 + (mouse_y - cerclexy[1])**2)
     if distance <= 20:
-        if clicked==1:
-             clicked=0
-             
-        else:
-            clicked=1
-            anti=0
-    return clicked,anti
+        return True
 
 def gui(tx,ty):
     
@@ -61,6 +55,11 @@ def gui(tx,ty):
     running = True
     hc=0
     fc=0
+    c1=0
+    c2=0
+    c3=0
+    c123=0
+    sib1=0
     slider = Slider(screen, 60, 250, 300, 30, min=0, max=99, step=1)
     output = TextBox(screen, 180, 300, 50, 50, fontSize=30)
 
@@ -100,27 +99,96 @@ def gui(tx,ty):
         text('Arial',agexy,30,"Votre age")
 
 ##################################################################################################
-        classe1xy=(100,300)
-        classe2xy=(150,300)
-        classe3xy=(250,300)
-        
+        cx=50
+        cd=100
+        cy=400
+        classe1xy=(cx,cy)
+        classe2xy=(cx+cd,cy)
+        classe3xy=(cx+cd+cd,cy)
+        text('Arial',classe1xy,30,"1")
+        text('Arial',classe2xy,30,"2")
+        text('Arial',classe3xy,30,"3")
+        text('Arial',(cx,cy-40),30,"Votre classe sociale")
+        cx=100
+        classe1xy=(cx,cy+20)
+        classe2xy=(cx+cd,cy+20)
+        classe3xy=(cx+cd+cd,cy+20)
+        cercle(classe1xy,20,5)
+        cercle(classe2xy,20,5)
+        cercle(classe3xy,20,5)
+        if c1==1:
+            cercle(classe1xy,10,0)
+        elif c2==1:
+            cercle(classe2xy,10,0)
+        elif c3==1:
+            cercle(classe3xy,10,0)
+
 
 ###################################################################################################
-#sibsp et parch
+
+
+
+
+
+
+
+####################################################################################################
+# parch
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
-                hc,fc=clickcercle(mouse_x, mouse_y,hommexy,hc,fc)
-                fc,hc=clickcercle(mouse_x, mouse_y,femmexy,fc,hc)
-                if hc==1:
-                    hfc=0
-                elif fc==1:
-                    hfc=1
-                else:
-                    hfc=2
-
+                #########################################################################################
+                #pour cocher les cercles
+                clicked=clickcercle(mouse_x, mouse_y,hommexy)
+                if clicked:
+                    if hc==1:
+                        hfc=2
+                        hc=0
+                    elif hc==0:
+                        hfc=0
+                        hc=1
+                        fc=0
+                clicked=clickcercle(mouse_x, mouse_y,femmexy)
+                if clicked:
+                    if fc==1:
+                        hfc=2
+                        fc=0
+                    elif fc==0:
+                        hfc=1
+                        fc=1
+                        hc=0
+                clicked=clickcercle(mouse_x, mouse_y,classe1xy)
+                if clicked:
+                    if c1==1:
+                        c123=0
+                        c1=0
+                    elif c1==0:
+                        c123=1
+                        c2,c3=0,0
+                        c1=1
+                clicked=clickcercle(mouse_x, mouse_y,classe2xy)
+                if clicked:
+                    if c2==1:
+                        c123=0
+                        c2=0
+                    elif c2==0:
+                        c123=2
+                        c1,c3=0,0
+                        c2=1
+                clicked=clickcercle(mouse_x, mouse_y,classe3xy)
+                if clicked:
+                    if c3==1:
+                        c123=0
+                        c3=0
+                    elif c3==0:
+                        c123=3
+                        c2,c1=0,0
+                        c3=1
+                ########################################################################################
+        
+            
         events = pygame.event.get()
         output.setText(slider.getValue())
         
