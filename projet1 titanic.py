@@ -8,10 +8,7 @@ import pygame
 from pygame_widgets.slider import Slider
 from pygame_widgets.textbox import TextBox
 
-import emoji
-
 import math
-print(emoji.EMOJI_DATA)
 df=pd.read_csv('titanic.csv')
 df = df.drop("Name", axis='columns')
 df = df.drop("Cabin", axis='columns')
@@ -40,9 +37,9 @@ def text(font,xy,size,text):
      my_font = pygame.font.SysFont(font, size)
      text_surface = my_font.render(text, True, (0, 0, 0))
      screen.blit(text_surface, xy)
-def clickcercle(mouse_x,mouse_y,cerclexy):
+def clickcercle(mouse_x,mouse_y,cerclexy,r):
     distance = math.sqrt((mouse_x - cerclexy[0])**2 + (mouse_y - cerclexy[1])**2)#equation math pour distance
-    if distance <= 20:
+    if distance <= r:
         return True
 def gui(tx,ty):
     
@@ -50,7 +47,7 @@ def gui(tx,ty):
     
     modele = DecisionTreeClassifier()
     modele.fit(tx, ty)
-    
+    erreurtemp=0
     
     pygame.display.set_caption("Le Titanic")
     white = (255, 255, 255)
@@ -67,13 +64,17 @@ def gui(tx,ty):
     outputage = TextBox(screen, 180, 300, 70, 50, fontSize=30)
     slidersib = Slider(screen, 60, 500, 300, 30, min=0, max=10, step=1)
     outputsib = TextBox(screen, 180, 550, 50, 50, fontSize=30)
+    sliderpar = Slider(screen, 500, 150, 300, 30, min=0, max=10, step=1)
+    outputpar = TextBox(screen, 620,200, 50, 50, fontSize=30)
+    submit=False
     while running:
+     if submit==False:
         pygame.init()
-        iy=1
-        ix=screen_width/3
+        iy=150
+        ix=screen_width/2
         tx=20
-        image = pygame.image.load('titanic_sink.png')
-        titre="peut tu survivre le titanic?"
+        image = pygame.image.load('titanic_sink1.png')
+        titre="Peut tu survivre le titanic?"
         titrexy=(20,20)
         text('Arial',titrexy,30,titre)
         screen.blit(image, (ix, iy))
@@ -128,15 +129,18 @@ def gui(tx,ty):
             cercle(classe3xy,10,0)
 
 ###################################################################################################
-# parch
+        
+
+
         for event in pygame.event.get():
+            
             if event.type == pygame.QUIT:
                 pygame.quit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
                 #########################################################################################
                 #pour cocher les cercles
-                clicked=clickcercle(mouse_x, mouse_y,hommexy)
+                clicked=clickcercle(mouse_x, mouse_y,hommexy,20)
                 if clicked:
                     if hc==1:
                         hfc=2
@@ -145,7 +149,7 @@ def gui(tx,ty):
                         hfc=0
                         hc=1
                         fc=0
-                clicked=clickcercle(mouse_x, mouse_y,femmexy)
+                clicked=clickcercle(mouse_x, mouse_y,femmexy,20)
                 if clicked:
                     if fc==1:
                         hfc=2
@@ -154,7 +158,7 @@ def gui(tx,ty):
                         hfc=1
                         fc=1
                         hc=0
-                clicked=clickcercle(mouse_x, mouse_y,classe1xy)
+                clicked=clickcercle(mouse_x, mouse_y,classe1xy,20)
                 if clicked:
                     if c1==1:
                         c123=0
@@ -163,7 +167,7 @@ def gui(tx,ty):
                         c123=1
                         c2,c3=0,0
                         c1=1
-                clicked=clickcercle(mouse_x, mouse_y,classe2xy)
+                clicked=clickcercle(mouse_x, mouse_y,classe2xy,20)
                 if clicked:
                     if c2==1:
                         c123=0
@@ -172,7 +176,7 @@ def gui(tx,ty):
                         c123=2
                         c1,c3=0,0
                         c2=1
-                clicked=clickcercle(mouse_x, mouse_y,classe3xy)
+                clicked=clickcercle(mouse_x, mouse_y,classe3xy,20)
                 if clicked:
                     if c3==1:
                         c123=0
@@ -181,17 +185,69 @@ def gui(tx,ty):
                         c123=3
                         c2,c1=0,0
                         c3=1
+                clicked=clickcercle(mouse_x1,mouse_y1,button,100)
+                if clicked:
+                    if hfc!=2 and c123!=0:
+
+                        new_data = pd.DataFrame({
+                        'Pclass': [c123], 
+                        'Sex': [hfc],
+                        'Age': [age],  
+                        'SibSp': [sibsp],  
+                        'Parch': [parc]    
+                            })
+                        
+                        new_data = pd.get_dummies(new_data)
+                        Prediction=modele.predict(new_data)
+                        submit=True
+                    else:
+                       erreurtemp=100
+                       
                 ########################################################################################
         
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
-                
+        if erreurtemp>0:
+            erreurtemp-=1
+            fonterreur = pygame.font.SysFont("Arial",30)
+            texterreur = fonterreur.render("Erreur! Veuillez bien remplir tous les informations!", True, (255, 0, 0))
+            screen.blit(texterreur, (400,300)) 
+        button=(1050,150)
+        buttonr=100
         events = pygame.event.get()
+        mouse_x1, mouse_y1 = pygame.mouse.get_pos()
+        clicked=clickcercle(mouse_x1,mouse_y1,button,buttonr)
+        if clicked:
+                pygame.draw.circle(screen, (0,0,255), button, buttonr,width=0)
+        else:
+            pygame.draw.circle(screen, (0,90,255), button, buttonr,width=0)
         outputage.setText(sliderage.getValue())
         outputsib.setText(slidersib.getValue())
-        text("Arial",(10,450),30,"Nombre de Frere soeur et epoux")
-        pygame_widgets.update(events)        
+        outputpar.setText(sliderpar.getValue())
+        sibsp=slidersib.getValue()
+        parc=sliderpar.getValue()
+        text("Arial",(10,450),30,"Nombre de Fraterie et epoux")
+        text("Arial",(500,100),30,"Nombre de Parent/enfant")
+        text("Arial",(1000,135),30,"Resultat")
+        pygame_widgets.update(events)  
+     else:
+        pygame.init()
+        pygame.display.flip()
+        screen.fill(white)
+        surv = pygame.image.load('survive.png')
+        mort = pygame.image.load('meurt.png')
+        print(Prediction)
+        if Prediction==0:
+            screen.blit(mort, (400, 200))
+            text("Arial",(400,0),30,"Tu n'a pas survecu le Titanic")
+        else:
+            screen.blit(surv, (400, 200))
+            text("Arial",(400,0),30,"BRAVO! Tu a survecu le Titanic")
+        for event in pygame.event.get():
+            
+            if event.type == pygame.QUIT:
+                pygame.quit()
     pygame.quit()
 if accuracy>0.65:
     print("Titanic")
